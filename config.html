@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Configurações</title>
+<link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+  }
+
+  body {
+    background: #1d1d26;
+    color: #00ff66;
+    height: 100vh;
+  }
+
+  header {
+    height: 60px;
+    background: #00ff66;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+  }
+
+  .btn-voltar {
+    display: flex;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #000;
+    color: #00ff66;
+    font-size: 25px;
+    cursor: pointer
+    justify-content: center;
+    align-items: center;
+  }
+
+  .config-area {
+    margin-top: 1px;
+    padding: 20px;
+  }
+
+  .titulo {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: 700;
+  }
+
+  .caixa {
+    background: #2d2a37;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
+    border: 2px solid #00ff66;
+  }
+
+  .opcoes {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+  }
+
+  .botao {
+    background: #111;
+    border: 2px solid #00ff66;
+    color: #00ff66;
+    padding: 10px 25px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+  }
+
+  .botao.ativo {
+    background: #00ff66;
+    color: black;
+  }
+
+  /* Caixa de seleção personalizada */
+  .select-box {
+    position: relative;
+    background: #1d1b25;
+    border: 2px solid #00ff66;
+    border-radius: 10px;
+    padding: 12px 15px;
+    cursor: pointer;
+    color: white;
+    font-size: 16px;
+  }
+
+  .select-box::after {
+    content: "+";
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #00ff66;
+    font-size: 35px;
+  }
+
+  .options {
+    position: absolute;
+    background: #2d2a37;
+    border: 2px solid #00ff66;
+    border-radius: 5px;
+    width: 50%;
+    top: 355px;
+    right: 45px;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.25s ease;
+  }
+
+  .options.active {
+    max-height: 300px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .option {
+    padding: 10px 15px;
+    color: #00ff66;
+    border-bottom: 1px solid #00ff66;
+    transition: 0.2s;
+  }
+
+  .option:hover {
+    background: #00ff66;
+    color: black;
+  }
+
+  .option:last-child {
+    border-bottom: none;
+  }
+
+  .bxs-cog {
+    display: flex;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #000;
+    font-size: 31px;
+    color: #00ff66;
+    justify-content: center;
+    align-items: center;
+  }
+
+</style>
+</head>
+<body>
+
+  <header>
+    <button class="btn-voltar" onclick="window.location.href='home.html'">
+      <i class='bx bx-log-out'></i>
+    </button>
+    <button class="btn-voltar" onclick="window.location.href='painel.html'"> <i class='bx bxs-cog'></i></button>
+  </header>
+  
+  <div class="config-area">
+    <!-- Proporção -->
+    <div class="caixa">
+      <div class="titulo">PROPORÇÃO TELA</div>
+      <div class="opcoes">
+        <button class="botao" id="btnFull">FULL</button>
+        <button class="botao" id="btn43">4:3</button>
+        <button class="botao" id="btn169">16:9</button>
+      </div>
+    </div>
+
+    <!-- Resolução -->
+    <div class="caixa">
+      <div class="titulo">RESOLUÇÃO DE TELA</div>
+      <div class="select-box" id="selectBox">1x NATIVO</div>
+      <div class="options" id="optionsList">
+        <div class="option">0.5X 800SD</div>
+        <div class="option">1X NATIVO</div>
+        <div class="option">1.5X HD</div>
+        <div class="option">2X FULL HD</div>
+        <div class="option">3X QHD</div>
+        <div class="option">4X 4K</div>
+        <div class="option">6X 6K</div>
+        
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // === Proporção ===
+    const botoes = document.querySelectorAll('.botao');
+    const proporcaoSalva = localStorage.getItem('proporcaoTela') || 'FULL';
+    botoes.forEach(btn => {
+      if (btn.textContent === proporcaoSalva) btn.classList.add('ativo');
+      btn.addEventListener('click', () => {
+        botoes.forEach(b => b.classList.remove('ativo'));
+        btn.classList.add('ativo');
+        localStorage.setItem('proporcaoTela', btn.textContent);
+      });
+    });
+
+    // === Resolução ===
+    const selectBox = document.getElementById('selectBox');
+    const optionsList = document.getElementById('optionsList');
+    const resolucaoSalva = localStorage.getItem('resolucaoTela') || '1x NATIVO';
+    selectBox.textContent = resolucaoSalva;
+
+    selectBox.addEventListener('click', () => {
+      optionsList.classList.toggle('active');
+    });
+
+    document.querySelectorAll('.option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        selectBox.textContent = opt.textContent;
+        localStorage.setItem('resolucaoTela', opt.textContent);
+        optionsList.classList.remove('active');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!selectBox.contains(e.target) && !optionsList.contains(e.target)) {
+        optionsList.classList.remove('active');
+      }
+    });
+  </script>
+
+</body>
+</html>

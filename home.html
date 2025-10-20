@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>nes cloud</title>
+
+  <!-- Poppins -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <!-- Boxicons -->
+  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #1b1b23;
+      --panel: #25252e;
+      --neon: #00ff66;
+      --card: #2a2a33;
+      --heart: #ff3b3b;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: #fff;
+      overflow-x: hidden;
+      height: 100vh;
+    }
+
+    /* Barra verde superior */
+    .top-green {
+      background: var(--neon);
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .top-green .logo {
+      height: 55px;
+      width: 55px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+
+    .top-green .gear {
+      position: absolute;
+      background: #000;
+      border-radius: 50%;
+      bottom: 10px;
+      right: 16px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .top-green .gear i {
+      font-size: 26px;
+      color: #00ff66;
+    }
+
+    /* Barra inferior de navegação */
+    .nav-bar {
+      background: var(--panel);
+      height:30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: sticky;
+      top: 50px;
+      z-index: 90;
+    }
+
+    .menu-icons {
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      position: relative;
+      width: 190px;
+    }
+
+    .menu-icons i {
+      font-size: 20px;
+      color: var(--neon);
+      z-index: 2;
+      transition: color 0.3s ease;
+      cursor: pointer;
+    }
+
+    .menu-icons i.active {
+      color: #000;
+    }
+
+    /* Bolinha verde */
+    .selector {
+      position: absolute;
+      height: 20px;
+      width: 71px;
+      background: var(--neon);
+      border-radius: 20px;
+      top: 0;
+      left: 0;
+      transition: transform 0.3s ease;
+      z-index: 1;
+    }
+
+    /* Barra de busca oculta inicialmente */
+    .search-container {
+      width: 92%;
+      max-width: 980px;
+      margin: 15px auto 0;
+      background: transparent;
+      border: 2px solid var(--neon);
+      border-radius: 25px;
+      height: 35px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      opacity: 0;
+      max-height: 0;
+      overflow: hidden;
+      transition: all 0.4s ease;
+    }
+
+    .search-container.active {
+      opacity: 1;
+      max-height: 60px;
+    }
+
+    .search-container input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: white;
+      font-size: 16px;
+      text-transform: uppercase;
+      width: 100%;
+    }
+
+    .search-container i {
+      color: var(--neon);
+      font-size: 20px;
+    }
+
+    /* Área de jogos */
+    .content {
+      padding: 5px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 5px;
+    }
+
+    .game-card {
+      border-radius: 5px;
+      width: 104px;
+      height: 160px;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+
+    .game-card:hover {
+      transform: translateY(-6px);
+    }
+
+    .game-card img {
+      border-radius: 5px;
+      width: 104%;
+      height: 160px;
+      object-fit: cover;
+    }
+
+    .favorite {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      color: var(--heart);
+      font-size: 24px;
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="top-green">
+    <img src="logo.png" alt="Logo" class="logo" />
+    <a href="painel.html">
+    <div class="gear"><i class="bx bx-cog"></i></div>
+    </a>
+  </div>
+
+  <div class="nav-bar">
+    <div class="menu-icons">
+      <div class="selector"></div>
+      <i class="bx bxs-heart" data-tab="favoritos"></i>
+      <i class="bx bxs-joystick active" data-tab="home"></i>
+      <i class="bx bx-search-alt-2" data-tab="pesquisa"></i>
+    </div>
+  </div>
+
+  <div class="search-container" id="searchBox">
+    <input type="text" id="searchInput" placeholder="BUSCAR JOGO..." />
+    <i class="bx bx-search"></i>
+  </div>
+
+  <div class="content" id="contentArea">
+    <!-- Jogos aparecerão aqui via localStorage -->
+  </div>
+
+  <script>
+/* --------------------------
+   CHAVES DE ARMAZENAMENTO
+   -------------------------- */
+const STORAGE_KEY = "cms_jogos_min_v2"; // jogos do painel
+const FAVORITES_KEY = "ig_favorites_v1"; // jogos favoritados
+
+/* --------------------------
+   ELEMENTOS DE INTERFACE
+   -------------------------- */
+const selector = document.querySelector(".selector");
+const icons = document.querySelectorAll(".menu-icons i");
+const searchBox = document.getElementById("searchBox");
+const searchInput = document.getElementById("searchInput");
+const contentArea = document.getElementById("contentArea");
+
+let currentTab = "home";
+let favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]");
+
+/* --------------------------
+   LER JOGOS DO PAINEL
+   -------------------------- */
+function readGames() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    return Array.isArray(data) ? data : [];
+  } catch {
+    return [];
+  }
+}
+
+/* --------------------------
+   RENDERIZAR OS JOGOS
+   -------------------------- */
+function renderGames(filter = "") {
+  const allGames = readGames().slice().reverse();
+  let games = allGames;
+
+  if (currentTab === "favoritos") {
+    games = games.filter((g) => favorites.includes(g.id));
+  }
+
+  if (filter.trim() !== "") {
+    const q = filter.toLowerCase();
+    games = games.filter((g) => (g.title || "").toLowerCase().includes(q));
+  }
+
+  contentArea.innerHTML = "";
+
+  if (games.length === 0) {
+    const msg = document.createElement("div");
+    msg.className = "empty";
+    msg.style.color = "#00ff66";
+    msg.style.textAlign = "center";
+    msg.style.marginTop = "40px";
+    msg.textContent = "NENHUM JOGO ENCONTRADO";
+    contentArea.appendChild(msg);
+    return;
+  }
+
+  // Grade de 3 colunas
+  contentArea.style.display = "grid";
+  contentArea.style.gridTemplateColumns = "repeat(3, 1fr)";
+  contentArea.style.gap = "15px";
+
+  games.forEach((g) => {
+    const div = document.createElement("div");
+    div.className = "game-card";
+    div.style.position = "relative";
+    div.style.cursor = "pointer";
+
+    div.innerHTML = `
+      <img src="${g.cover || ""}" alt="${g.title || ""}" styl="width:100%;height:100px;object-fit:cover;border-radius:10px;">
+      <i class="bx bxs-heart favorite ${
+        favorites.includes(g.id) ? "active" : ""
+      }" styl="position:absolute;bottom:100px;right:100px;font-size:22px;color:${
+      favorites.includes(g.id) ? "#ff3b3b" : "#00ff66"
+    };"></i>
+    `;
+
+    // abrir download.html?id=...
+    div.addEventListener("click", (e) => {
+      if (e.target.classList.contains("favorite")) return;
+      window.location.href = `play.html?id=${g.id}`;
+    });
+
+    // favoritar/desfavoritar
+    const fav = div.querySelector(".favorite");
+    fav.addEventListener("click", (e) => {
+      e.stopPropagation();
+      toggleFavorite(g.id, fav);
+    });
+
+    contentArea.appendChild(div);
+  });
+}
+
+/* --------------------------
+   FAVORITAR / DESFAVORITAR
+   -------------------------- */
+function toggleFavorite(id, el) {
+  const idx = favorites.indexOf(id);
+  if (idx === -1) {
+    favorites.push(id);
+    el.classList.add("active");
+    el.style.color = "#ff3b3b";
+  } else {
+    favorites.splice(idx, 1);
+    el.classList.remove("active");
+    el.style.color = "#00ff66";
+  }
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+}
+
+/* --------------------------
+   NAVEGAÇÃO ENTRE ABAS
+   -------------------------- */
+let activeIndex = 1; // começa na aba "home"
+moveSelector(activeIndex);
+
+icons.forEach((icon, index) => {
+  icon.addEventListener("click", () => {
+    icons.forEach((i) => i.classList.remove("active"));
+    icon.classList.add("active");
+    moveSelector(index);
+
+    const tab = icon.dataset.tab;
+    currentTab = tab;
+
+    if (tab === "pesquisa") {
+      searchBox.classList.add("active");
+      searchInput.focus();
+    } else {
+      searchBox.classList.remove("active");
+      searchInput.value = "";
+    }
+
+    renderGames(searchInput.value);
+  });
+});
+
+function moveSelector(index) {
+  const offset = index * 60;
+  selector.style.transform = `translateX(${offset}px)`;
+}
+
+/* --------------------------
+   PESQUISA EM TEMPO REAL
+   -------------------------- */
+searchInput.addEventListener("input", () => {
+  renderGames(searchInput.value);
+});
+
+/* --------------------------
+   ATUALIZAÇÃO AUTOMÁTICA
+   -------------------------- */
+window.addEventListener("storage", (e) => {
+  if (e.key === STORAGE_KEY || e.key === FAVORITES_KEY) {
+    favorites = JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]");
+    renderGames(searchInput.value);
+  }
+});
+
+/* --------------------------
+   INICIALIZAÇÃO
+   -------------------------- */
+function init() {
+  currentTab = "home";
+  renderGames();
+}
+init();
+</script>
+
+
+</body>
+</html>

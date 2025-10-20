@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PAINEL CLOUD</title>
+<style>
+  :root{
+    --red:#1e1e2a;
+    --page:#2d2a37;
+    --panel:#262328;
+    --line:#00ff66;
+    --text:#f5f5f5;
+    --muted:#00ff66;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:var(--red);font-family:Arial, Helvetica, sans-serif;color:var(--text)}
+  .wrap{
+    max-width:1240px;margin:28px auto;padding:20px;background:var(--page);border:10px solid var(--red);display:grid;grid-template-columns:320px 1fr;gap:28px;border-radius:4px;
+  }
+
+  .left{height:820px;overflow:auto}
+  .panel{background:var(--panel);border:3px solid var(--line);border-radius:6px;padding:14px;height:100%;}
+  .panel h2{margin:0 0 12px 0;font-size:15px;font-weight:800;color:var(--text)}
+  .list{display:flex;flex-direction:column;gap:12px}
+  .item{display:flex;align-items:center;gap:10px;padding:8px;border-radius:4px;background:var(--page);border:3px solid var(--line)}
+  .item img{width:56px;height:78px;object-fit:cover;border-radius:4px;border:4px solid var(--page)}
+  .meta{flex:1}
+  .meta b{display:block;font-size:13px;color:var(--text)}
+  .meta small{display:block;color:var(--muted);font-size:12px;margin-top:6px}
+  .actions{display:flex;flex-direction:column;gap:6px}
+  .btn{background:var(--panel);border:3px solid var(--line);padding:6px 8px;border-radius:6px;color:var(--text);font-weight:800;cursor:pointer;}
+  .btn.ghost{background:transparent}
+  .btn.danger{background:#00ff66;border-color:transparent;color:#000}
+
+  .right{height:820px;overflow:auto}
+  .form{background:var(--panel);border:3px solid var(--line);border-radius:6px;padding:18px;min-height:740px;display:flex;flex-direction:column;gap:12px;}
+  .bubble{display:inline-block;padding:6px 12px;border-radius:999px;background:var(--panel);border:3px solid var(--line);font-weight:800;color:var(--text);font-size:12px;margin-bottom:6px}
+  .top{display:flex;gap:16px;align-items:flex-start}
+  .cover{width:150px;height:210px;border-radius:6px;border:3px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:transparent;}
+  .cover img{width:100%;height:100%;object-fit:cover}
+  .fields{flex:1;display:flex;flex-direction:column;gap:10px}
+  input[type="text"],input[type="number"],textarea{width:100%;padding:12px;border-radius:18px;border:3px solid var(--line);background:transparent;color:var(--muted);outline:none;font-size:14px;}
+  textarea{min-height:120px;resize:vertical;border-radius:18px;padding:14px}
+  .row-small{display:flex;gap:12px;align-items:center}
+  .small-field{flex:1}
+  .banners{display:flex;gap:12px;margin-top:6px}
+  .banner{flex:1;height:120px;border-radius:6px;border:3px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden;background:transparent;}
+  .banner img{width:100%;height:100%;object-fit:cover}
+  .save-row{display:flex;justify-content:center;margin-top:8px}
+  .save-btn{padding:12px 48px;border-radius:999px;border:6px solid var(--line);background:transparent;color:var(--text);font-weight:900;font-size:18px;cursor:pointer}
+  .hint{font-size:100px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="left">
+      <div class="panel">
+        <h2>JOGOS SALVOS</h2>
+        <div id="list" class="list"></div>
+      </div>
+    </div>
+
+    <div class="right">
+      <form id="form" class="form" onsubmit="return false;">
+        <div class="top">
+          <div class="cover" id="coverBox"><span class="hint">+</span></div>
+          <div class="fields">
+            <div>
+              <div class="bubble">TÍTULO</div>
+              <input id="title" type="text" placeholder="Nome do jogo">
+            </div>
+            <div>
+              <div class="bubble">DESCRIÇÃO</div>
+              <textarea id="description" placeholder="Descrição do jogo..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="row-small">
+          <div class="small-field">
+            <div class="bubble">ANO</div>
+            <input id="year" type="number" placeholder="2024">
+          </div>
+          <div class="small-field">
+            <div class="bubble">TAMANHO</div>
+            <input id="size" type="text" placeholder="Ex: 50 GB">
+          </div>
+          <div class="small-field">
+            <div class="bubble">IDIOMA</div>
+            <input id="language" type="text" placeholder="Português">
+          </div>
+        </div>
+
+        <div>
+          <div class="bubble">STREAMING</div>
+          <input id="link" type="text" placeholder="https://download...">
+        </div>
+
+        <div>
+          <div class="bubble">STREAMING PRO</div>
+          <input id="link2" type="text" placeholder="https://mirror...">
+        </div>
+
+        <div class="banners">
+          <div class="banner" id="banner1"><span class="hint">+</span></div>
+          <div class="banner" id="banner2"><span class="hint">+</span></div>
+          <div class="banner" id="banner3"><span class="hint">+</span></div>
+        </div>
+
+        <div class="save-row">
+          <button id="saveBtn" type="button" class="save-btn">SALVAR</button>
+        </div>
+
+        <input id="coverInput" type="file" accept="image/*" style="display:none">
+        <input id="bannerInput1" type="file" accept="image/*" style="display:none">
+        <input id="bannerInput2" type="file" accept="image/*" style="display:none">
+        <input id="bannerInput3" type="file" accept="image/*" style="display:none">
+      </form>
+    </div>
+  </div>
+
+<script>
+const STORAGE_KEY = 'cms_jogos_min_v2';
+const listEl = document.getElementById('list');
+const coverBox = document.getElementById('coverBox');
+const coverInput = document.getElementById('coverInput');
+const banner1 = document.getElementById('banner1');
+const banner2 = document.getElementById('banner2');
+const banner3 = document.getElementById('banner3');
+const bInput1 = document.getElementById('bannerInput1');
+const bInput2 = document.getElementById('bannerInput2');
+const bInput3 = document.getElementById('bannerInput3');
+const titleEl = document.getElementById('title');
+const descEl = document.getElementById('description');
+const yearEl = document.getElementById('year');
+const sizeEl = document.getElementById('size');
+const langEl = document.getElementById('language');
+const linkEl = document.getElementById('link');
+const link2El = document.getElementById('link2');
+const saveBtn = document.getElementById('saveBtn');
+
+let DB = [], editingId = null, pending = { cover:null, banner1:null, banner2:null, banner3:null };
+
+const uid = () => 'g_' + Date.now() + '_' + Math.floor(Math.random()*9000+1000);
+const toBase64 = file => new Promise((res,rej)=>{
+  if(!file) return res(null);
+  const r = new FileReader();
+  r.onload = ()=>res(r.result);
+  r.onerror = ()=>rej('Erro');
+  r.readAsDataURL(file);
+});
+const placeholder = (w=56,h=78)=>'data:image/svg+xml;utf8,'+encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='${w}' height='${h}'></svg>`);
+
+function load(){ try{ DB = JSON.parse(localStorage.getItem(STORAGE_KEY))||[]; }catch(e){ DB=[]; } renderList(); }
+function persist(){ localStorage.setItem(STORAGE_KEY, JSON.stringify(DB)); renderList(); }
+
+function renderList(){
+  listEl.innerHTML = '';
+  if(!DB.length){ listEl.innerHTML = '<div style="color:var(--muted);font-size:13px">Nenhum jogo salvo</div>'; return; }
+  DB.forEach(g=>{
+    const it = document.createElement('div'); it.className = 'item';
+    const img = document.createElement('img'); img.src = g.cover || placeholder(56,78);
+    const meta = document.createElement('div'); meta.className='meta';
+    const b = document.createElement('b'); b.textContent = g.title || 'Sem título';
+    const s = document.createElement('small'); s.textContent = `${g.year||'—'} • ${g.size||'—'}`;
+    meta.append(b,s);
+    const actions = document.createElement('div'); actions.className='actions';
+    const v = document.createElement('button'); v.className='btn ghost'; v.textContent='VER'; v.onclick=()=>loadToForm(g.id);
+    const d = document.createElement('button'); d.className='btn danger'; d.textContent='EXCLUIR';
+    d.onclick=()=>{ if(confirm('Excluir?')){ DB = DB.filter(x=>x.id!==g.id); if(editingId===g.id) clearForm(); persist(); } };
+    actions.append(v,d);
+    it.append(img,meta,actions);
+    listEl.append(it);
+  });
+}
+
+function loadToForm(id){
+  const g = DB.find(x=>x.id===id); if(!g) return;
+  editingId = g.id;
+  titleEl.value = g.title || '';
+  descEl.value = g.description || '';
+  yearEl.value = g.year || '';
+  sizeEl.value = g.size || '';
+  langEl.value = g.language || '';
+  linkEl.value = g.link || '';
+  link2El.value = g.link2 || '';
+  pending.cover = g.cover || null;
+  pending.banner1 = g.banner1 || null;
+  pending.banner2 = g.banner2 || null;
+  pending.banner3 = g.banner3 || null;
+  renderPreviews();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function clearForm(){
+  editingId = null;
+  titleEl.value = descEl.value = yearEl.value = sizeEl.value = langEl.value = linkEl.value = link2El.value = '';
+  pending = { cover:null,banner1:null,banner2:null,banner3:null };
+  coverInput.value = bInput1.value = bInput2.value = bInput3.value = '';
+  renderPreviews();
+}
+
+function renderPreviews(){
+  coverBox.innerHTML = pending.cover ? `<img src="${pending.cover}">` : '<span class="hint">+</span>';
+  banner1.innerHTML = pending.banner1 ? `<img src="${pending.banner1}">` : '<span class="hint">+</span>';
+  banner2.innerHTML = pending.banner2 ? `<img src="${pending.banner2}">` : '<span class="hint">+</span>';
+  banner3.innerHTML = pending.banner3 ? `<img src="${pending.banner3}">` : '<span class="hint">+</span>';
+}
+
+coverBox.onclick = ()=>coverInput.click();
+banner1.onclick = ()=>bInput1.click();
+banner2.onclick = ()=>bInput2.click();
+banner3.onclick = ()=>bInput3.click();
+
+coverInput.onchange = async e => { const f=e.target.files[0]; pending.cover = f?await toBase64(f):null; renderPreviews(); };
+bInput1.onchange = async e => { const f=e.target.files[0]; pending.banner1 = f?await toBase64(f):null; renderPreviews(); };
+bInput2.onchange = async e => { const f=e.target.files[0]; pending.banner2 = f?await toBase64(f):null; renderPreviews(); };
+bInput3.onchange = async e => { const f=e.target.files[0]; pending.banner3 = f?await toBase64(f):null; renderPreviews(); };
+
+saveBtn.onclick = async()=>{
+  const title = titleEl.value.trim();
+  if(!title){ alert('Preencha o título'); return; }
+
+  const obj = {
+    id: editingId || uid(),
+    title,
+    description: descEl.value.trim(),
+    year: yearEl.value.trim(),
+    size: sizeEl.value.trim(),
+    language: langEl.value.trim(),
+    link: linkEl.value.trim(),
+    link2: link2El.value.trim(),
+    cover: pending.cover,
+    banner1: pending.banner1,
+    banner2: pending.banner2,
+    banner3: pending.banner3
+  };
+
+  const idx = DB.findIndex(x=>x.id===obj.id);
+  if(idx>=0) DB[idx] = obj; else DB.unshift(obj);
+  persist();
+  alert('Salvo com sucesso!');
+  clearForm();
+};
+
+load();
+clearForm();
+</script>
+</body>
+</html>

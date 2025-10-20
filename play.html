@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>jogo</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  body {
+    margin: 0;
+    background-color: #1b1c23;
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+  }
+
+  header {
+    background-color: #00ff66;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  header img {
+    height: 45px;
+    height: 45px;
+    border-radius: 8px;
+  }
+  
+  .logo {
+    display: flex;
+    width: 55px;
+    height: 55px;
+  }
+
+  .content {
+    padding: 9px;
+  }
+
+  .top {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  .top img {
+    width: 150px;
+    height: 225px;
+    object-fit: cover;
+    border-radius: 7px;
+  }
+
+  .title {
+    font-size: 19px;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .info-box {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 30px;
+  }
+
+  .info {
+    background: transparent;
+    border: 2px solid #00ff66;
+    border-radius: 5px;
+    padding: 1px 5px;
+    text-align: center;
+  }
+
+  .info span {
+    display: block;
+    font-weight: 540;
+  }
+
+  .info small {
+    color: #00ff66;
+    font-weight: 750;
+  }
+
+  .download-btn {
+    border: 2px solid #00ff66;
+    border-radius: 40px;
+    padding: 5px 50px;
+    display: inline-block;
+    color: #fff;
+    font-weight: 700;
+    font-size: 18px;
+    margin-top: 20px;
+    transition: 0.2s;
+    cursor: pointer;
+  }
+
+  .download-btn:hover {
+    background: #00ff66;
+    color: #111;
+  }
+
+  .descricao {
+    border: 2px solid #00ff66;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 30px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .mostrarMais {
+    display: block;
+    color: #00ff66;
+    text-align: center;
+    font-weight: 700;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+
+  .banners {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    margin-top: 40px;
+  }
+
+  .banners img {
+    width: 340px;
+    height: 210px;
+    object-fit: cover;
+    border-radius: 7px;
+    flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+  <header>
+    <img src="logo.png" alt="HerculanoTV Play" class="logo">
+  </header>
+
+  <div class="content" id="conteudo"></div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const jogos = JSON.parse(localStorage.getItem("cms_jogos_min_v2") || "[]");
+    const jogo = jogos.find(j => j.id === id);
+
+    if (!jogo) {
+      document.body.innerHTML = "<p style='color:#00ff66;text-align:center;margin-top:50px;'>Jogo não encontrado.</p>";
+    } else {
+      const conteudo = document.getElementById("conteudo");
+      conteudo.innerHTML = `
+        <div class="top">
+          <img src="${jogo.cover}" alt="${jogo.title}">
+          <div>
+            <div class="title">${jogo.title}</div>
+            <div class="info-box">
+              <div class="info"><span>ANO</span><small>${jogo.year}</small></div>
+              <div class="info"><span>PING</span><small>${jogo.size}</small></div>
+              <div class="info"><span>IDIOMA</span><small>${jogo.language}</small></div>
+            </div>
+            <div class="download-btn" id="baixar">JOGAR</div>
+          </div>
+        </div>
+
+        <div class="descricao" id="desc">${jogo.description}</div>
+        <span class="mostrarMais" id="mostrarMais">MOSTRAR MAIS</span>
+
+        <div class="banners" id="banners"></div>
+      `;
+    document.getElementById("baixar").onclick = () => {
+  window.location.href = `jogo.html?url=${encodeURIComponent(jogo.link)}`;
+};
+
+      
+
+      const desc = document.getElementById("desc");
+      const mostrarMais = document.getElementById("mostrarMais");
+      if (desc.textContent.length < 200) {
+        mostrarMais.style.display = "none";
+      } else {
+        let expandido = false;
+        const textoOriginal = desc.textContent;
+        desc.textContent = textoOriginal.slice(0, 200) + "...";
+        mostrarMais.onclick = () => {
+          expandido = !expandido;
+          desc.textContent = expandido ? textoOriginal : textoOriginal.slice(0, 200) + "...";
+          mostrarMais.textContent = expandido ? "MOSTRAR MENOS" : "MOSTRAR MAIS";
+        };
+      }
+
+      const bannersContainer = document.getElementById("banners");
+      [jogo.banner1, jogo.banner2, jogo.banner3].forEach(b => {
+        if (b) {
+          const img = document.createElement("img");
+          img.src = b;
+          bannersContainer.appendChild(img);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
